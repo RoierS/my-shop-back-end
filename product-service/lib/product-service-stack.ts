@@ -21,6 +21,12 @@ export class ProductServiceStack extends cdk.Stack {
       functionName: 'getProductsList',
     });
 
+    const getProductById = new NodejsFunction(this, 'GetProductByIdLambda', {
+      ...commonProps,
+      entry: 'handlers/getProductById.ts',
+      functionName: 'getProductById',
+    });
+
     const apiGateway = new aws_apigatewayv2.HttpApi(this, 'GetProductsListApi', {
       apiName: 'GetProductsListApi',
       corsPreflight: {
