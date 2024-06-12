@@ -1,25 +1,11 @@
 import { products } from "../data/product"
+import { createResponse } from "../utils/createResponse"
 
 export const handler = async () => {
   try {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: JSON.stringify(products),
-    }
+    return createResponse(200, products)
   } catch (error: any) {
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: JSON.stringify({ message: error.message }),
-    }
+    return createResponse(200, error.message)
   }
 }
+
