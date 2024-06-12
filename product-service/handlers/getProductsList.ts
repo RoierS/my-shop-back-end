@@ -1,3 +1,5 @@
+import { products } from "../data/product"
+
 export const handler = async () => {
   try {
     return {
@@ -7,9 +9,7 @@ export const handler = async () => {
         'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Credentials': true,
       },
-      body: JSON.stringify({ 
-        // TODO: products list
-       }),
+      body: JSON.stringify(products),
     }
   } catch (error: any) {
     return {
