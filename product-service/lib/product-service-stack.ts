@@ -42,5 +42,11 @@ export class ProductServiceStack extends cdk.Stack {
       integration: new HttpLambdaIntegration('GetProductsListIntegration', getProductsList),
     });
 
+    apiGateway.addRoutes({
+      path: '/products/{productId}',
+      methods: [aws_apigatewayv2.HttpMethod.GET],
+      integration: new HttpLambdaIntegration('GetProductByIdIntegration', getProductById),
+    });
+
   }
 }
