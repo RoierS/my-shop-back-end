@@ -5,7 +5,7 @@ export const handler = async () => {
   try {
     return createResponse(200, products)
   } catch (error: any) {
-    return createResponse(200, error.message)
+    return createResponse(500, error.message)
   }
 }
 

@@ -14,7 +14,7 @@ export const handler = async (event: any) => {
     return createResponse(200, product)
 
   } catch (error: any) {
-    return createResponse(200, error.message)
+    return createResponse(500, error.message)
   }
 }
 
