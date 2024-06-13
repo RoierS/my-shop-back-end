@@ -1,4 +1,4 @@
-import { products } from "../data/product"
+import { products } from "../mockData/products"
 import { IProduct } from "../interfaces/Product"
 import { createResponse } from "../utils/createResponse"
 

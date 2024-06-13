@@ -1,5 +1,5 @@
 import { handler as getProductsList } from "../handlers/getProductsList";
-import {products} from "../data/product";
+import {products} from "../mockData/products";
 import * as createResponseModule from '../utils/createResponse';
 
 describe('getProductsList', () => {

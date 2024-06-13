@@ -1,5 +1,3 @@
-import { IProduct } from "../interfaces/Product"
-
 export const createResponse = (statusCode: number = 200, body?: any) => {
   return {
     statusCode,
