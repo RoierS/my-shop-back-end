@@ -16,6 +16,8 @@ const fillTable = async () => {
       count: Math.floor(Math.random() * 100) + 1,
     };
 
+    console.log('Product:', product);
+    console.log('Stock:', stock);
 
     const transactItems = [
       {
