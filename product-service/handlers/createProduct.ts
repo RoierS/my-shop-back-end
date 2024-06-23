@@ -3,25 +3,29 @@ import { PRODUCTS_TABLE_NAME, STOCKS_TABLE_NAME } from "../constants/constants";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
 import { createResponse } from "../utils/createResponse";
+import { validateProductData } from "../utils/validateProductData";
 
 const client = new DynamoDBClient({ region: process.env.PRODUCT_AWS_REGION })
 
 export const handler = async (event: any) => {
   console.log('Create Product Lambda:', event);
   try {
-    const { title, description, price, count } = JSON.parse(event.body);
+    const productData = JSON.parse(event.body);
+
+    validateProductData(productData);
+
     const productId = uuidv4();
 
     const newProductItem = {
       id: productId,
-      title,
-      description,
-      price,
+      title: productData.title,
+      description: productData.description,
+      price: productData.price,
     }
 
     const newStockItem = {
       product_id: productId,
-      count: count,
+      count: productData.count || 0,
     }
 
     const params = {
