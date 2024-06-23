@@ -32,6 +32,12 @@ export class ProductServiceStack extends cdk.Stack {
       functionName: 'getProductById',
     });
 
+    const createProduct = new NodejsFunction(this, 'CreateProductLambda', {
+      ...commonProps,
+      entry: 'handlers/createProduct.ts',
+      functionName: 'createProduct',
+    });
+
     const apiGateway = new aws_apigatewayv2.HttpApi(this, 'GetProductsListApi', {
       apiName: 'GetProductsListApi',
       corsPreflight: {
@@ -43,10 +49,11 @@ export class ProductServiceStack extends cdk.Stack {
 
     productsTable.grantReadData(getProductsList);
     productsTable.grantReadData(getProductById);
+    productsTable.grantWriteData(createProduct);
 
     stocksTable.grantReadData(getProductsList);
     stocksTable.grantReadData(getProductById);
-
+    stocksTable.grantWriteData(createProduct);
 
     apiGateway.addRoutes({
       path: '/products',
@@ -58,6 +65,12 @@ export class ProductServiceStack extends cdk.Stack {
       path: '/products/{productId}',
       methods: [aws_apigatewayv2.HttpMethod.GET],
       integration: new HttpLambdaIntegration('GetProductByIdIntegration', getProductById),
+    });
+
+    apiGateway.addRoutes({
+      path: '/products',
+      methods: [aws_apigatewayv2.HttpMethod.POST],
+      integration: new HttpLambdaIntegration('CreateProductIntegration', createProduct),
     });
 
   }
