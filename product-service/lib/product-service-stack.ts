@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { aws_apigatewayv2, aws_lambda } from "aws-cdk-lib";
+import { aws_apigatewayv2, aws_dynamodb, aws_lambda } from "aws-cdk-lib";
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { NodejsFunction, NodejsFunctionProps } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from 'constructs';
@@ -8,10 +8,15 @@ export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const productsTable = aws_dynamodb.Table.fromTableName(this, 'ProductsTable', 'products_DB');
+    const stocksTable = aws_dynamodb.Table.fromTableName(this, 'StocksTable', 'stocks_DB');
+
     const commonProps: Partial<NodejsFunctionProps> =  {
       runtime: aws_lambda.Runtime.NODEJS_20_X,
       environment: {
         PRODUCT_AWS_REGION: process.env.PRODUCT_AWS_REGION!,
+        PRODUCTS_TABLE_NAME: productsTable.tableName,
+        STOCKS_TABLE_NAME: stocksTable.tableName,
       }
     }
 
@@ -35,6 +40,13 @@ export class ProductServiceStack extends cdk.Stack {
         allowMethods: [aws_apigatewayv2.CorsHttpMethod.GET],
       }
     });
+
+    productsTable.grantReadData(getProductsList);
+    productsTable.grantReadData(getProductById);
+
+    stocksTable.grantReadData(getProductsList);
+    stocksTable.grantReadData(getProductById);
+
 
     apiGateway.addRoutes({
       path: '/products',
