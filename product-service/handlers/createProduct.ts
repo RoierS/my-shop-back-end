@@ -51,6 +51,10 @@ export const handler = async (event: any) => {
   } catch (error: any) {
     console.error('Error creating product:', error);
     
+      if (error instanceof Error) {
+      return createResponse(400, error.message);
+    }
+    
     return createResponse(500, error.message);
   }
 }
