@@ -2,6 +2,7 @@ import {
   aws_apigatewayv2,
   aws_lambda,
   aws_s3_notifications,
+  CfnOutput,
   Stack,
   StackProps,
 } from "aws-cdk-lib";
@@ -26,6 +27,7 @@ export class ImportServiceStack extends Stack {
     const commonProps: Partial<NodejsFunctionProps> = {
       runtime: aws_lambda.Runtime.NODEJS_20_X,
       environment: {
+        PRODUCT_AWS_REGION: awsRegion,
         BUCKET_NAME,
         UPLOADED_FOLDER,
       },
@@ -78,6 +80,10 @@ export class ImportServiceStack extends Stack {
         "ImportProductFileIntegration",
         importProductFile,
       ),
+    });
+
+    new CfnOutput(this, "ImportService URL", {
+      value: `${apiGateway.url}import`,
     });
   }
 }
