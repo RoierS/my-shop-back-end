@@ -32,7 +32,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     console.log("Signed URL has been generated:", signedUrl);
 
-    return createResponse(200, { url: signedUrl });
+    return createResponse(200, signedUrl);
   } catch {
     console.error("Error creating signed URL", error);
     return createResponse(500, { message: "Internal Server Error" });

@@ -1,6 +1,6 @@
-id,count,price,title,description
-19ba3d6a-f8ed-491b-a192-0a33b71b38c4,2,200,"Product Title","This product is an example of a CSV data entry for products."
-6f7a8b2c-4d05-432f-9e75-63fd2a89f479,5,150,"Another Product","This is another example product with some description."
-8c6e9f3d-1c2b-4a10-bad3-874f58d32a7e,1,300,"Premium Product","A high-end product with detailed features and benefits."
-42f85c60-5901-4b26-b7cc-cbbe3b92805f,3,100,"Budget Item","A cost-effective option for everyday use."
-9d2fe71a-8f59-45fc-98b0-4b3cfb2c2e9f,4,250,"Bestseller Product","Our most popular product, loved by many customers."
+id,title,description,count,price
+1,T-shirt,Comfortable cotton t-shirt,10,15.99
+2,Jeans,Classic denim jeans,15,29.99
+3,Hoodie,Warm fleece hoodie,8,24.99
+4,Sneakers,Stylish sports sneakers,20,39.99
+5,Skirt,Elegant floral print skirt,12,19.99
