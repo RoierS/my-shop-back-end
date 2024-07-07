@@ -13,6 +13,7 @@ import {
 } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Bucket, EventType } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
+import * as sqs from "aws-cdk-lib/aws-sqs";
 
 const BUCKET_NAME = "my-import-csv-bucket";
 const UPLOADED_FOLDER = "uploaded/";
@@ -24,12 +25,21 @@ export class ImportServiceStack extends Stack {
 
     const bucket = Bucket.fromBucketName(this, "import bucket", BUCKET_NAME);
 
+    const queue = sqs.Queue.fromQueueArn(
+      this,
+      "importItemsQueue",
+      "arn:aws:sqs:eu-west-1:992382621053:importItemsQueue",
+    );
+
+    console.log("queue.queueUrl:", queue.queueUrl);
+
     const commonProps: Partial<NodejsFunctionProps> = {
       runtime: aws_lambda.Runtime.NODEJS_20_X,
       environment: {
         PRODUCT_AWS_REGION: awsRegion,
         BUCKET_NAME,
         UPLOADED_FOLDER,
+        IMPORT_QUEUE_URL: queue.queueUrl,
       },
     };
 
@@ -57,6 +67,7 @@ export class ImportServiceStack extends Stack {
 
     bucket.grantReadWrite(importFileParser);
     bucket.grantDelete(importFileParser);
+    queue.grantSendMessages(importFileParser);
 
     bucket.addEventNotification(
       EventType.OBJECT_CREATED,
@@ -84,6 +95,12 @@ export class ImportServiceStack extends Stack {
 
     new CfnOutput(this, "ImportService URL", {
       value: `${apiGateway.url}import`,
+    });
+    new CfnOutput(this, "importQueueURL", {
+      value: queue.queueUrl,
+    });
+    new CfnOutput(this, "importQueueARN", {
+      value: queue.queueArn,
     });
   }
 }
