@@ -45,7 +45,7 @@ export class ProductServiceStack extends cdk.Stack {
       protocol: sns.SubscriptionProtocol.EMAIL,
       endpoint: process.env.STOCK_EMAIL!,
       filterPolicy: {
-        price: sns.SubscriptionFilter.numericFilter({ lessThanOrEqualTo: 20 }),
+        count: sns.SubscriptionFilter.numericFilter({ lessThanOrEqualTo: 20 }),
       },
     });
 
@@ -99,7 +99,7 @@ export class ProductServiceStack extends cdk.Stack {
         corsPreflight: {
           allowHeaders: ["*"],
           allowOrigins: ["*"],
-          allowMethods: [aws_apigatewayv2.CorsHttpMethod.GET],
+          allowMethods: [aws_apigatewayv2.CorsHttpMethod.ANY],
         },
       },
     );
@@ -141,6 +141,10 @@ export class ProductServiceStack extends cdk.Stack {
         "CreateProductIntegration",
         createProduct,
       ),
+    });
+
+    new cdk.CfnOutput(this, "importTopicARN", {
+      value: importTopic.topicArn,
     });
   }
 }
