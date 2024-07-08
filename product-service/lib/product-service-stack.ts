@@ -10,6 +10,7 @@ import {
 } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { IMPORT_TOPIC_ARN } from "../constants/constants";
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -37,15 +38,15 @@ export class ProductServiceStack extends cdk.Stack {
     new sns.Subscription(this, "StockSubscription", {
       topic: importTopic,
       protocol: sns.SubscriptionProtocol.EMAIL,
-      endpoint: process.env.STOCK_EMAIL!,
+      endpoint: "iermoliuk.roman@gmail.com",
     });
 
     new sns.Subscription(this, "FilteredStockSubscription", {
       topic: importTopic,
       protocol: sns.SubscriptionProtocol.EMAIL,
-      endpoint: process.env.STOCK_EMAIL!,
+      endpoint: "iermoliuk.katerina@gmail.com",
       filterPolicy: {
-        count: sns.SubscriptionFilter.numericFilter({ lessThanOrEqualTo: 20 }),
+        count: sns.SubscriptionFilter.numericFilter({ lessThanOrEqualTo: 10 }),
       },
     });
 
@@ -55,7 +56,7 @@ export class ProductServiceStack extends cdk.Stack {
         PRODUCT_AWS_REGION: process.env.PRODUCT_AWS_REGION!,
         PRODUCTS_TABLE_NAME: productsTable.tableName,
         STOCKS_TABLE_NAME: stocksTable.tableName,
-        IMPORT_TOPIC_ARN: importTopic.topicArn,
+        IMPORT_TOPIC_ARN: IMPORT_TOPIC_ARN,
       },
     };
 

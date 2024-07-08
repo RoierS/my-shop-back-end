@@ -1,11 +1,9 @@
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 import { SQSEvent } from "aws-lambda";
 import { createResponse } from "../utils/createResponse";
-import { validateProductData } from "../utils/validateProductData";
 import { PRODUCTS_TABLE_NAME, STOCKS_TABLE_NAME } from "../constants/constants";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
 
 const client = new DynamoDBClient({ region: process.env.PRODUCT_AWS_REGION });
 
@@ -21,23 +19,21 @@ export const handler = async (event: SQSEvent) => {
     for (const record of Records) {
       const { body } = record;
 
+      if (!body) return createResponse(404, "Body not Found!");
+
       const productData = JSON.parse(body);
 
       console.log("New Product Data:", productData);
 
-      validateProductData(productData);
-
-      const productId = uuidv4();
-
       const newProductItem = {
-        id: productId,
+        id: productData.id,
         title: productData.title,
         description: productData.description,
         price: productData.price,
       };
 
       const newStockItem = {
-        product_id: productId,
+        product_id: productData.id,
         count: productData.count || 0,
       };
 
@@ -63,7 +59,7 @@ export const handler = async (event: SQSEvent) => {
       const publishParams = new PublishCommand({
         Subject: "New Products Added",
         Message: JSON.stringify(productData),
-        TopicArn: process.env.IMPORT_TOPIC_ARN,
+        TopicArn: "arn:aws:sns:eu-west-1:992382621053:importItemsTopic",
         MessageAttributes: {
           count: {
             DataType: "Number",
