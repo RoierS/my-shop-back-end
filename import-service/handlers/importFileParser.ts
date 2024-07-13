@@ -9,6 +9,9 @@ import {
 import { Readable } from "stream";
 import csv from "csv-parser";
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const awsRegion = "eu-west-1";
 const s3Client = new S3Client({ region: awsRegion });

@@ -3,6 +3,9 @@ import { createResponse } from "../utils/createResponse";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { error } from "console";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const BUCKET_NAME = "my-import-csv-bucket";
 const UPLOADED_FOLDER = "uploaded/";

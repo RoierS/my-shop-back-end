@@ -3,6 +3,7 @@ import {
   aws_lambda,
   aws_s3_notifications,
   CfnOutput,
+  Duration,
   Stack,
   StackProps,
 } from "aws-cdk-lib";
@@ -14,6 +15,13 @@ import {
 import { Bucket, EventType } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import * as sqs from "aws-cdk-lib/aws-sqs";
+import * as dotenv from "dotenv";
+import {
+  HttpLambdaAuthorizer,
+  HttpLambdaResponseType,
+} from "aws-cdk-lib/aws-apigatewayv2-authorizers";
+
+dotenv.config();
 
 const BUCKET_NAME = "my-import-csv-bucket";
 const UPLOADED_FOLDER = "uploaded/";
@@ -75,6 +83,28 @@ export class ImportServiceStack extends Stack {
       { prefix: UPLOADED_FOLDER },
     );
 
+    const basicAuthorizerLambda = aws_lambda.Function.fromFunctionArn(
+      this,
+      "basicAuthorizer",
+      process.env.BASIC_AUTHORIZER_ARN!,
+    );
+
+    const authorizer = new HttpLambdaAuthorizer(
+      "basicAuthorizer",
+      basicAuthorizerLambda,
+      {
+        resultsCacheTtl: Duration.seconds(0),
+        responseTypes: [HttpLambdaResponseType.IAM],
+      },
+    );
+
+    new aws_lambda.CfnPermission(this, "importPermission", {
+      action: "lambda:InvokeFunction",
+      functionName: basicAuthorizerLambda.functionName,
+      principal: "apigateway.amazonaws.com",
+      sourceArn: this.account,
+    });
+
     const apiGateway = new aws_apigatewayv2.HttpApi(this, "ImportProductApi", {
       apiName: "ImportProductApi",
       corsPreflight: {
@@ -91,6 +121,7 @@ export class ImportServiceStack extends Stack {
         "ImportProductFileIntegration",
         importProductFile,
       ),
+      authorizer,
     });
 
     new CfnOutput(this, "ImportService URL", {
