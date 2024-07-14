@@ -2,39 +2,46 @@ import {
   APIGatewayAuthorizerResult,
   APIGatewayTokenAuthorizerEvent,
 } from "aws-lambda";
-import * as dotenv from "dotenv";
 import { createPolicy } from "../utils/helpers";
+import * as dotenv from "dotenv";
 
 dotenv.config();
 
-export const handler = async (
+export const handler = (
   event: APIGatewayTokenAuthorizerEvent,
   _context: any,
   callback: any,
-): Promise<APIGatewayAuthorizerResult> => {
+) => {
   console.log("Basic Authorizer Event:", event);
+  console.log("Token:", event.authorizationToken);
 
   try {
     if (!event.authorizationToken) {
-      callback("Token is missing", null);
+      callback("Unauthorized");
     }
     const authToken = event.authorizationToken;
 
     const encodedCreds = authToken.split(" ")[1];
-    const buff = Buffer.from(encodedCreds, "base64").toString("utf-8");
-    const [username, password] = buff.split(":");
 
+    if (!encodedCreds) {
+      callback("Token is not provided");
+    }
+
+    const buff = Buffer.from(encodedCreds, "base64");
+    const [username, password] = buff.toString("utf-8").split(":");
+    console.log("Username:", username);
+    console.log("Password:", password);
     const storedUserPassword = process.env[username];
 
     const effect =
       !storedUserPassword || storedUserPassword !== password ? "Deny" : "Allow";
 
+    console.log("Effect:", effect);
+
     const policy = createPolicy(username, effect, event.methodArn);
 
     return callback(null, policy);
   } catch (error) {
-    console.error(error);
-
-    return callback("Unauthorized", error);
+    return callback("Unauthorized:", (error as Error).message);
   }
 };
