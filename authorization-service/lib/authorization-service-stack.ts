@@ -11,7 +11,7 @@ export class AuthorizationServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const basicAuthorizer = new NodejsFunction(this, "GetProductsListLambda", {
+    const basicAuthorizer = new NodejsFunction(this, "basicAuthorizer", {
       runtime: Runtime.NODEJS_20_X,
       functionName: "basicAuthorizer",
       entry: "handlers/basicAuthorizer.ts",

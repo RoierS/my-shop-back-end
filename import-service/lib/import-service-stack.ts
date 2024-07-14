@@ -85,7 +85,7 @@ export class ImportServiceStack extends Stack {
 
     const basicAuthorizer = aws_lambda.Function.fromFunctionArn(
       this,
-      "basicAuthorizer",
+      "fromFunctionArn",
       "arn:aws:lambda:eu-west-1:992382621053:function:basicAuthorizer",
     );
 
@@ -98,13 +98,6 @@ export class ImportServiceStack extends Stack {
       },
     );
 
-    new aws_lambda.CfnPermission(this, "importPermission", {
-      action: "lambda:InvokeFunction",
-      functionName: basicAuthorizer.functionName,
-      principal: "apigateway.amazonaws.com",
-      sourceAccount: this.account,
-    });
-
     const apiGateway = new aws_apigatewayv2.HttpApi(this, "ImportProductApi", {
       apiName: "ImportProductApi",
       corsPreflight: {
@@ -112,6 +105,13 @@ export class ImportServiceStack extends Stack {
         allowOrigins: ["*"],
         allowMethods: [aws_apigatewayv2.CorsHttpMethod.ANY],
       },
+    });
+
+    new aws_lambda.CfnPermission(this, "importPermission", {
+      action: "lambda:InvokeFunction",
+      functionName: basicAuthorizer.functionName,
+      principal: "apigateway.amazonaws.com",
+      sourceAccount: this.account,
     });
 
     apiGateway.addRoutes({
