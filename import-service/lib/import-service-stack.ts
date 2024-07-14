@@ -83,26 +83,26 @@ export class ImportServiceStack extends Stack {
       { prefix: UPLOADED_FOLDER },
     );
 
-    const basicAuthorizerLambda = aws_lambda.Function.fromFunctionArn(
+    const basicAuthorizer = aws_lambda.Function.fromFunctionArn(
       this,
       "basicAuthorizer",
-      process.env.BASIC_AUTHORIZER_ARN!,
+      "arn:aws:lambda:eu-west-1:992382621053:function:basicAuthorizer",
     );
 
     const authorizer = new HttpLambdaAuthorizer(
       "basicAuthorizer",
-      basicAuthorizerLambda,
+      basicAuthorizer,
       {
-        resultsCacheTtl: Duration.seconds(0),
         responseTypes: [HttpLambdaResponseType.IAM],
+        resultsCacheTtl: Duration.seconds(0),
       },
     );
 
     new aws_lambda.CfnPermission(this, "importPermission", {
       action: "lambda:InvokeFunction",
-      functionName: basicAuthorizerLambda.functionName,
+      functionName: basicAuthorizer.functionName,
       principal: "apigateway.amazonaws.com",
-      sourceArn: this.account,
+      sourceAccount: this.account,
     });
 
     const apiGateway = new aws_apigatewayv2.HttpApi(this, "ImportProductApi", {
